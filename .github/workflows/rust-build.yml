@@ -1,0 +1,27 @@
+name: Rust Build Check
+
+on:
+  push:
+    paths: ['**/*.rs']
+  pull_request:
+    paths: ['**/*.rs']
+
+jobs:
+  docker_build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: |
+        docker build -t bevy-dev .
+
+    - name: Run build in Docker container
+      run: |
+        docker run --rm \
+          -v ${{ github.workspace }}:/app \
+          -w /app \
+          bevy-dev \
+          cargo build --release
